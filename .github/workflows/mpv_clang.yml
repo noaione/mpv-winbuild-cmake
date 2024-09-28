@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        bit: [i686, x86_64, x86_64_v3, aarch64]
+        bit: [x86_64, x86_64_v3]
     env:
       BIT: ${{ matrix.bit }}
     container:
@@ -201,10 +201,10 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       CURL_RETRIES: "--connect-timeout 60 --retry 999 --retry-delay 5 --retry-all-errors"
-      release_i686_key: ${{ secrets.CACHE_VERSION }}-release_i686-${{ github.run_id }}
+      # release_i686_key: ${{ secrets.CACHE_VERSION }}-release_i686-${{ github.run_id }}
       release_x86_64_key: ${{ secrets.CACHE_VERSION }}-release_x86_64-${{ github.run_id }}
       release_x86_64_v3_key: ${{ secrets.CACHE_VERSION }}-release_x86_64_v3-${{ github.run_id }}
-      release_aarch64_key: ${{ secrets.CACHE_VERSION }}-release_aarch64-${{ github.run_id }}
+      # release_aarch64_key: ${{ secrets.CACHE_VERSION }}-release_aarch64-${{ github.run_id }}
     container:
       image: docker://alpine:latest
 
@@ -221,11 +221,11 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
 
-      - name: Loading release_i686 cache
-        uses: actions/cache/restore@main
-        with:
-          path: release_i686
-          key: ${{ env.release_i686_key }}
+      # - name: Loading release_i686 cache
+      #   uses: actions/cache/restore@main
+      #   with:
+      #     path: release_i686
+      #     key: ${{ env.release_i686_key }}
 
       - name: Loading release_x86_64 cache
         uses: actions/cache/restore@main
@@ -239,16 +239,16 @@ jobs:
           path: release_x86_64_v3
           key: ${{ env.release_x86_64_v3_key }}
 
-      - name: Loading release_aarch64 cache
-        uses: actions/cache/restore@main
-        with:
-          path: release_aarch64
-          key: ${{ env.release_aarch64_key }}
+      # - name: Loading release_aarch64 cache
+      #   uses: actions/cache/restore@main
+      #   with:
+      #     path: release_aarch64
+      #     key: ${{ env.release_aarch64_key }}
 
       - name: Moving archives
         run: |
           mkdir -p release
-          mv release_i686/* release_x86_64/* release_x86_64_v3/* release_aarch64/* release
+          mv release_x86_64/* release_x86_64_v3/* release
           du -ah release/*
 
       - name: Uploading packages to Sourceforge
@@ -314,10 +314,8 @@ jobs:
       - name: Delete releases cache
         if: ${{ github.event.inputs.github_release == 'false' || steps.upload_packages_gh.outcome == 'success' }}
         run: |
-          curl -u ${{ github.repository_owner }}:$GH_TOKEN $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$release_i686_key
           curl -u ${{ github.repository_owner }}:$GH_TOKEN $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$release_x86_64_key
           curl -u ${{ github.repository_owner }}:$GH_TOKEN $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$release_x86_64_v3_key
-          curl -u ${{ github.repository_owner }}:$GH_TOKEN $CURL_RETRIES -s -o /dev/null -X DELETE -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/actions/caches?key=$release_aarch64_key
 
   # call_workflow:
   #   name: Run mpv_gcc
