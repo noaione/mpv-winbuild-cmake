@@ -7,9 +7,6 @@ ExternalProject_Add(openssl
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--sparse --filter=tree:0"
     GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !test"
-    GIT_REMOTE_NAME origin
-    GIT_TAG master
-    GIT_RESET a82d9e5
     GIT_SUBMODULES ""
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
